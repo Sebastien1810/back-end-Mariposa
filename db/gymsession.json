@@ -1,0 +1,22 @@
+[
+  {
+    "location": "Gym A",
+    "typeOfWorkout": "Treadmill (Intervals, Incline Walking, Endurance Run)"
+  },
+  {
+    "location": "Gym B",
+    "typeOfWorkout": "Elliptical (Steady State, Interval Training)"
+  },
+  {
+    "location": "Gym C",
+    "typeOfWorkout": "Stationary Bike (Spin Class, Steady Pedal)"
+  },
+  {
+    "location": "Gym D",
+    "typeOfWorkout": "Free Weight Training (Bench Press, Squats, Deadlifts, Overhead Press)"
+  },
+  {
+    "location": "Gym E",
+    "typeOfWorkout": "Yoga Classes (Hatha, Vinyasa)"
+  }
+]

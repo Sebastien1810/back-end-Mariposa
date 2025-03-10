@@ -39,4 +39,6 @@ const gymSessionSchema = new Schema({
   },
 });
 
-module.exports = model("GymSession", gymSessionSchema);
+const GymSession = model("GymSession", gymSessionSchema);
+
+module.exports = GymSession;

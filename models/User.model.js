@@ -3,13 +3,9 @@ const { Schema, model } = require("mongoose");
 // TODO: Please make sure you edit the User model to whatever makes sense in this case
 const userSchema = new Schema(
   {
-    firstName: {
+    name: {
       type: String,
-      required: [true, "First Name is required."],
-    },
-    lastName: {
-      type: String,
-      required: [true, "Last Name is required."],
+      required: [true, "A Name is required."],
     },
     email: {
       type: String,
@@ -28,6 +24,11 @@ const userSchema = new Schema(
     favoriteTimeforWorkout: {
       type: String,
       enum: ["morning", "afternoon", "evening"],
+    },
+    gymSessionPreference: {
+      type: Schema.Types.ObjectId,
+      ref: "GymSession",
+      required: [true, "Gym session preference is required."],
     },
   },
   {

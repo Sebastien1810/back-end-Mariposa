@@ -10,15 +10,23 @@ require("./db");
 const express = require("express");
 
 const app = express();
+const cors = require("cors");
 
 // ℹ️ This function is getting exported from the config folder. It runs most pieces of middleware
 require("./config")(app);
+app.use(cors({ origin: process.env.ORIGIN }));
+
+app.get("/", (req, res) => {
+  res.send("status: healthy");
+});
 
 // 👇 Start handling routes here
+const AuthRoutes = require("./routes/Auth.routes");
 const GymSessionRoutes = require("./routes/GymSession.routes");
 const User = require("./routes/Users.routes");
-const Comment = require("./routes/Comment.Routes");
+const Comment = require("./routes/Comment.routes");
 
+app.use("/api", AuthRoutes);
 app.use("/api", GymSessionRoutes);
 app.use("/api", User);
 app.use("/api", Comment);
