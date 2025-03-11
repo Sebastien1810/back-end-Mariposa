@@ -1,18 +1,26 @@
 // models/Comment.model.js
 const { Schema, model } = require("mongoose");
 
-const commentSchema = new Schema(
-  {
-    content: { type: String, required: true },
-    gymSession: {
-      type: Schema.Types.ObjectId,
-      ref: "GymSession",
-      required: true,
-    },
-    createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+const commentSchema = new Schema({
+  commentContent: {
+    type: String,
+    required: true,
   },
-  { timestamps: true }
-);
+  creationDate: {
+    type: Date,
+    default: Date.now,
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  gymSession: {
+    type: Schema.Types.ObjectId,
+    ref: "GymSession",
+    required: true,
+  },
+});
 
 const Comment = model("Comment", commentSchema);
 

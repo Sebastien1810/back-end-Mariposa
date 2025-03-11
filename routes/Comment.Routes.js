@@ -14,4 +14,20 @@ router.post("/Comment", (req, res) => {
       res.status(500).json({ error: "Failed to create a new comment" });
     });
 });
+router.delete("/Comment/:id", (req, res) => {
+  const commentId = req.params.id;
+
+  Comment.findByIdAndDelete(commentId)
+    .then((deleteComment) => {
+      if (!deleteComment) {
+        return res.status(404).json({ error: "Comment not found" });
+      }
+      res.status(204).send();
+    })
+    .catch((error) => {
+      console.log("error deleting comment", error);
+      res.status(500).json({ error: "Eror deleting comment" });
+    });
+});
+
 module.exports = router;

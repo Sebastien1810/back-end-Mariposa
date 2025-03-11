@@ -36,6 +36,16 @@ const gymSessionSchema = new Schema({
       "Agility Ladder Drills (Quick Feet, Coordination Exercises)",
     ],
     required: [true, "Type of workout is required."],
+    creator: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "Creator is required."],
+    },
+  },
+  creator: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "Creator is required."],
   },
 });
 
