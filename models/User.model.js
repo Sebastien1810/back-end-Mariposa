@@ -28,7 +28,6 @@ const userSchema = new Schema(
     gymSessionPreference: {
       type: Schema.Types.ObjectId,
       ref: "GymSession",
-      required: [true, "Gym session preference is required."],
     },
   },
   {

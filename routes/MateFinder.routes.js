@@ -2,12 +2,13 @@
 const router = require("express").Router();
 const MateFinderProfile = require("../models/MateFinderProfile");
 
+// Création/Mise à jour du profil matefinder
 router.post("/matefinder/profile", (req, res) => {
   const {
     user,
     location,
     preferredWorkoutType,
-    availableTimes,
+    availableTimes, // assurez-vous que c'est un tableau, ex: ["Morning"]
     experienceLevel,
   } = req.body;
 
@@ -25,20 +26,21 @@ router.post("/matefinder/profile", (req, res) => {
     });
 });
 
+// Recherche de profils matefinder
 router.get("/matefinder", (req, res) => {
   const { location, preferredWorkoutType, availableTime, experienceLevel } =
     req.query;
 
   let filter = {};
-
   if (location) {
     filter.location = location;
   }
   if (preferredWorkoutType) {
     filter.preferredWorkoutType = preferredWorkoutType;
   }
+  // Pour availableTime, on vérifie que ce champ figure dans le tableau availableTimes
   if (availableTime) {
-    filter.availableTimes = availableTime;
+    filter.availableTimes = { $in: [availableTime] };
   }
   if (experienceLevel) {
     filter.experienceLevel = experienceLevel;
@@ -46,7 +48,11 @@ router.get("/matefinder", (req, res) => {
 
   MateFinderProfile.find(filter)
     .populate("user")
-    .then((profiles) => res.json(profiles))
+    .then((profiles) => {
+      console.log("Filter used:", filter);
+      console.log("Matching profiles:", profiles);
+      res.json(profiles);
+    })
     .catch((error) => {
       console.error("Error fetching MateFinder profiles:", error);
       res.status(500).json({ error: "Error fetching MateFinder profiles" });
