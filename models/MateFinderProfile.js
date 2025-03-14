@@ -1,21 +1,16 @@
-// models/MateFinderProfile.model.js
+// models/MateFinderProfile.js
 const { Schema, model } = require("mongoose");
 
 const mateFinderProfileSchema = new Schema(
   {
-    // Référence vers l'utilisateur existant
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      unique: true,
-    },
-    location: { type: String },
-    preferredWorkoutType: { type: String },
-    availableTimes: { type: [String] },
-    experienceLevel: { type: String },
+    firstName: { type: String, required: true },
+    location: { type: String, required: true },
+    workoutType: { type: String, required: true },
+    availableTime: { type: String, required: true },
+    level: { type: String, required: true },
   },
   { timestamps: true }
 );
 
-module.exports = model("MateFinderProfile", mateFinderProfileSchema);
+const MateFinderProfile = model("MateFinderProfile", mateFinderProfileSchema);
+module.exports = MateFinderProfile;

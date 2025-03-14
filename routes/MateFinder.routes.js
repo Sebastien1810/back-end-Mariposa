@@ -1,61 +1,45 @@
 // routes/MateFinder.routes.js
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const MateFinderProfile = require("../models/MateFinderProfile");
 
-// Création/Mise à jour du profil matefinder
-router.post("/matefinder/profile", (req, res) => {
-  const {
-    user,
-    location,
-    preferredWorkoutType,
-    availableTimes, // assurez-vous que c'est un tableau, ex: ["Morning"]
-    experienceLevel,
-  } = req.body;
+// POST route to create a new MateFinder profile
+router.post("/profile", (req, res) => {
+  const { firstName, location, workoutType, availableTime, level } = req.body;
 
-  MateFinderProfile.findOneAndUpdate(
-    { user },
-    { location, preferredWorkoutType, availableTimes, experienceLevel },
-    { new: true, upsert: true }
-  )
-    .then((profile) => res.status(200).json(profile))
-    .catch((error) => {
-      console.error("Error creating/updating MateFinder profile:", error);
-      res
-        .status(500)
-        .json({ error: "Failed to create or update MateFinder profile" });
+  if (!firstName || !location || !workoutType || !availableTime || !level) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  MateFinderProfile.create({
+    firstName,
+    location,
+    workoutType,
+    availableTime,
+    level,
+  })
+    .then((newProfile) => res.status(201).json(newProfile))
+    .catch((err) => {
+      console.error("Error creating MateFinder profile:", err);
+      res.status(500).json({ error: "Internal server error" });
     });
 });
 
-// Recherche de profils matefinder
-router.get("/matefinder", (req, res) => {
-  const { location, preferredWorkoutType, availableTime, experienceLevel } =
-    req.query;
+// GET route to find matching profiles
+router.get("/", (req, res) => {
+  const { location, workoutType, availableTime, level } = req.query;
+  const filter = {};
 
-  let filter = {};
-  if (location) {
-    filter.location = location;
-  }
-  if (preferredWorkoutType) {
-    filter.preferredWorkoutType = preferredWorkoutType;
-  }
-  // Pour availableTime, on vérifie que ce champ figure dans le tableau availableTimes
-  if (availableTime) {
-    filter.availableTimes = { $in: [availableTime] };
-  }
-  if (experienceLevel) {
-    filter.experienceLevel = experienceLevel;
-  }
+  if (location) filter.location = location;
+  if (workoutType) filter.workoutType = workoutType;
+  if (availableTime) filter.availableTime = availableTime;
+  if (level) filter.level = level;
 
   MateFinderProfile.find(filter)
-    .populate("user")
-    .then((profiles) => {
-      console.log("Filter used:", filter);
-      console.log("Matching profiles:", profiles);
-      res.json(profiles);
-    })
-    .catch((error) => {
-      console.error("Error fetching MateFinder profiles:", error);
-      res.status(500).json({ error: "Error fetching MateFinder profiles" });
+    .then((profiles) => res.json(profiles))
+    .catch((err) => {
+      console.error("Error fetching MateFinder profiles:", err);
+      res.status(500).json({ error: "Internal server error" });
     });
 });
 

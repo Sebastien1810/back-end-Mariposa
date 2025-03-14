@@ -1,39 +1,40 @@
-// ℹ️ Gets access to environment variables/settings
-// https://www.npmjs.com/package/dotenv
+// app.js
 require("dotenv").config();
+require("./db"); // Connection à la base de données
 
-// ℹ️ Connects to the database
-require("./db");
-
-// Handles http requests (express is node js framework)
-// https://www.npmjs.com/package/express
 const express = require("express");
-
 const app = express();
 const cors = require("cors");
 
-// ℹ️ This function is getting exported from the config folder. It runs most pieces of middleware
+// Exécution de la configuration middleware (configurations supplémentaires dans ./config)
 require("./config")(app);
+
+// Configure CORS pour autoriser les requêtes depuis le front-end
 app.use(cors({ origin: process.env.ORIGIN }));
 
+// Analyse des requêtes JSON entrantes
+app.use(express.json());
+
+// Route de vérification de santé
 app.get("/", (req, res) => {
   res.send("status: healthy");
 });
 
-// 👇 Start handling routes here
+// Import des routes existantes
 const AuthRoutes = require("./routes/Auth.routes");
 const GymSessionRoutes = require("./routes/GymSession.routes");
-const User = require("./routes/Users.routes");
-const Comment = require("./routes/Comment.routes");
+const UserRoutes = require("./routes/Users.routes");
+const CommentRoutes = require("./routes/Comment.routes");
 const MateFinderRoutes = require("./routes/MateFinder.routes");
 
-app.use("/api", MateFinderRoutes);
+// Utilisation des routes
+app.use("/api/matefinder", MateFinderRoutes); // Routes MateFinder
 app.use("/api", AuthRoutes);
 app.use("/api", GymSessionRoutes);
-app.use("/api", User);
-app.use("/api", Comment);
+app.use("/api", UserRoutes);
+app.use("/api", CommentRoutes);
 
-// ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
+// Gestion globale des erreurs et routes non trouvées
 require("./error-handling")(app);
 
 module.exports = app;
