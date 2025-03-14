@@ -29,7 +29,7 @@ const MateFinderRoutes = require("./routes/MateFinder.routes");
 
 // Utilisation des routes
 app.use("/api/matefinder", MateFinderRoutes); // Routes MateFinder
-app.use("/api", AuthRoutes);
+app.use("/", AuthRoutes);
 app.use("/api", GymSessionRoutes);
 app.use("/api", UserRoutes);
 app.use("/api", CommentRoutes);
