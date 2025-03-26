@@ -1,46 +1,62 @@
-// routes/MateFinder.routes.js
-const express = require("express");
-const router = express.Router();
-const MateFinderProfile = require("../models/MateFinderProfile");
+const router = require("express").Router();
+const MateFinder = require("../models/MateFinder");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
-// POST route to create a new MateFinder profile
-router.post("/profile", (req, res) => {
-  const { firstName, location, workoutType, availableTime, level } = req.body;
-
-  if (!firstName || !location || !workoutType || !availableTime || !level) {
-    return res.status(400).json({ error: "Missing required fields" });
+// GET /api/matefinder -> Récupère le profil MateFinder de l'utilisateur connecté
+router.get("/", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.payload._id;
+    const profile = await MateFinder.findOne({ user: userId });
+    res.json(profile); // peut être null si pas encore créé
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching MateFinder profile", err });
   }
-
-  MateFinderProfile.create({
-    firstName,
-    location,
-    workoutType,
-    availableTime,
-    level,
-  })
-    .then((newProfile) => res.status(201).json(newProfile))
-    .catch((err) => {
-      console.error("Error creating MateFinder profile:", err);
-      res.status(500).json({ error: "Internal server error" });
-    });
 });
 
-// GET route to find matching profiles
-router.get("/", (req, res) => {
-  const { location, workoutType, availableTime, level } = req.query;
-  const filter = {};
+//POST /api/matefinder -> Crée ou met à jour le profil MateFinder
+router.post("/", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.payload._id;
+    const { location, preferredWorkout, preferredTime } = req.body;
 
-  if (location) filter.location = location;
-  if (workoutType) filter.workoutType = workoutType;
-  if (availableTime) filter.availableTime = availableTime;
-  if (level) filter.level = level;
+    // findOneAndUpdate + upsert => si profil existe on update sinon, on le crée
+    const profile = await MateFinder.findOneAndUpdate(
+      { user: userId },
+      { location, preferredWorkout, preferredTime, user: userId },
+      { new: true, upsert: true }
+    );
+    res.json(profile);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error updating/creating MateFinder", err });
+  }
+});
 
-  MateFinderProfile.find(filter)
-    .then((profiles) => res.json(profiles))
-    .catch((err) => {
-      console.error("Error fetching MateFinder profiles:", err);
-      res.status(500).json({ error: "Internal server error" });
+//  GET /api/matefinder/matches -> Cherche des GymSessions qui matchent le profil
+router.get("/matches", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.payload._id;
+    const profile = await MateFinder.findOne({ user: userId });
+
+    if (!profile) {
+      return res.json([]); // Pas de profil => pas de suggestions
+    }
+
+    // On récupère le modèle GymSession
+    const GymSession = require("../models/GymSession.model");
+
+    // Filtre de matching  ex. workout = preferredWorkout, favoriteTime = preferredTime
+    const matches = await GymSession.find({
+      typeOfWorkout: profile.preferredWorkout,
+      favoriteTimeforWorkout: profile.preferredTime,
+      location: profile.location, // ou un critère plus souple
     });
+
+    res.json(matches);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching matches", err });
+  }
 });
 
 module.exports = router;

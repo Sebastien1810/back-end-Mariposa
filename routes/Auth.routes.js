@@ -108,6 +108,7 @@ router.post("/auth/login", (req, res, next) => {
 
 // Route de vérification
 router.get("/auth/verify", isAuthenticated, (req, res, next) => {
+  console.log(isAuthenticated);
   console.log("req.payload", req.payload);
   res.json(req.payload);
 });

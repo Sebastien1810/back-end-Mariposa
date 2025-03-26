@@ -25,10 +25,10 @@ const AuthRoutes = require("./routes/Auth.routes");
 const GymSessionRoutes = require("./routes/GymSession.routes");
 const UserRoutes = require("./routes/Users.routes");
 const CommentRoutes = require("./routes/Comment.routes");
-const MateFinderRoutes = require("./routes/MateFinder.routes");
+const mateFinderRoutes = require("./routes/MateFinder.routes");
 
 // Utilisation des routes
-app.use("/api/matefinder", MateFinderRoutes); // Routes MateFinder
+app.use("/api/matefinder", mateFinderRoutes);
 app.use("/", AuthRoutes);
 app.use("/api", GymSessionRoutes);
 app.use("/api", UserRoutes);
